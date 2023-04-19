@@ -1,2 +1,2 @@
-# ts-jasmine-webpack-template
-A template for creating a typescript project with webpack and jasmine
+# Description
+A collision library for games
