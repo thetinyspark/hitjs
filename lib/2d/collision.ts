@@ -1,4 +1,5 @@
 import AABB from "./primitive/AABB";
+import Circle from "./primitive/Circle";
 import Point from "./primitive/Point";
 
 export function pointVSAABB(point:Point, aabb:AABB):boolean{
@@ -28,4 +29,30 @@ export function AABBVSAABB(boxA:AABB, boxB:AABB):boolean{
         topA > bottomB ||
         bottomA < topB
     );
+}
+
+export function pointVSCircle(point:Point, circle:Circle):boolean{
+    const dx = (point.x - circle.x);
+    const dy = (point.y - circle.y);
+    const d2 = (dx * dx) + (dy * dy) ;
+    const r2 = circle.radius * circle.radius;
+    return r2 >= d2;
+    // const center = new Point(); 
+    // center.x = circle.x;
+    // center.y = circle.y;
+    // return Point.getDistanceBetween(point,center) <= circle.radius;
+}
+
+export function circleVScircle(a:Circle, b:Circle):boolean{
+    const centerA:Point = new Point();
+    const centerB:Point = new Point();
+    centerA.x = a.x;
+    centerA.y = a.y;
+
+    centerB.x = b.x;
+    centerB.y = b.y;
+
+    const distA:number = Point.getDistanceBetween(centerA, centerB);
+    const distB:number = a.radius + b.radius;
+    return  distA <= distB;
 }

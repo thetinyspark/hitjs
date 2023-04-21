@@ -1,5 +1,6 @@
-import {pointVSAABB,AABBVSAABB} from "../../lib/2d/collision";
+import {pointVSAABB,AABBVSAABB, pointVSCircle, circleVScircle} from "../../lib/2d/collision";
 import AABB from "../../lib/2d/primitive/AABB";
+import Circle from "../../lib/2d/primitive/Circle";
 import Point from "../../lib/2d/primitive/Point";
 
 describe('2d collision test suite', 
@@ -80,6 +81,76 @@ describe('2d collision test suite',
                 boxB.height  = test.boxB.h;
 
                 return AABBVSAABB(boxA,boxB);
+            }
+        ); 
+
+        // then 
+        expect(expectedResults).toEqual(results);
+    }); 
+
+    it('should be able to say if a Point collides a circle', 
+    ()=>{
+        // given
+        const testbed = [
+            {point:{x:-1,y:-1}      , circ:{x:100,y:100,r:100}, expected:false },
+            {point:{x:0,y:0}        , circ:{x:100,y:100,r:100}, expected:false },
+            {point:{x:100,y:100}    , circ:{x:100,y:100,r:100}, expected:true },
+            {point:{x:100,y:200}    , circ:{x:100,y:100,r:100}, expected:true },
+            {point:{x:0,y:200}      , circ:{x:100,y:100,r:100}, expected:false },
+            {point:{x:200,y:100}    , circ:{x:100,y:100,r:100}, expected:true },
+            {point:{x:0,y:200}      , circ:{x:100,y:100,r:100}, expected:false },
+        ]
+
+        // when 
+        
+        const expectedResults = testbed.map( (t)=>t.expected);
+        const results = testbed.map(
+            (test)=>{
+                const point   = new Point();
+                const circ   = new Circle();
+
+                point.x     = test.point.x;
+                point.y     = test.point.y;
+
+                circ.x      = test.circ.x;
+                circ.y      = test.circ.y;
+                circ.radius = test.circ.r;
+
+                return pointVSCircle(point,circ);
+            }
+        ); 
+
+        // then 
+        expect(expectedResults).toEqual(results);
+    }); 
+
+    it('should be able to say if a circle collides another circle', 
+    ()=>{
+        // given
+        const testbed = [
+            {a:{x:0,y:0, r: 100}, b:{x:100,y:100,r:100}, expected:true },
+            {a:{x:-1,y:-1, r: 100}, b:{x:100,y:100,r:100}, expected:true },
+            {a:{x:-100,y:100, r: 100}, b:{x:100,y:100,r:100}, expected:true },
+            {a:{x:100,y:-100, r: 100}, b:{x:100,y:100,r:100}, expected:true },
+            {a:{x:-100,y:-100, r: 100}, b:{x:100,y:100,r:100}, expected:false },
+        ];
+
+        // when 
+        const expectedResults = testbed.map( (t)=>t.expected);
+        const results = testbed.map(
+            (test)=>{
+                const a   = new Circle();
+                const b   = new Circle();
+
+                a.x      = test.a.x;
+                a.y      = test.a.y;
+                a.radius = test.a.r;
+
+                b.x      = test.b.x;
+                b.y      = test.b.y;
+                b.radius = test.b.r;
+
+                return circleVScircle(a,b);
             }
         ); 
 
