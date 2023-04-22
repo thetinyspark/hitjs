@@ -8,6 +8,7 @@
     "/dist"
   ],
   "scripts": {
+    "exp":"http-server ./",
     "pub": "npm login && npm publish --access public",
     "build": "tsc && npx webpack --config webpack.config.js",
     "test": "karma start",

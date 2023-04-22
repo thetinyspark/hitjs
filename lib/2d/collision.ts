@@ -1,6 +1,8 @@
 import AABB from "./primitive/AABB";
 import Circle from "./primitive/Circle";
+import OBB from "./primitive/OBB";
 import Point from "./primitive/Point";
+import Segment from "./primitive/Segment";
 
 export function pointVSAABB(point:Point, aabb:AABB):boolean{
     const left:number   = aabb.x;
@@ -32,27 +34,36 @@ export function AABBVSAABB(boxA:AABB, boxB:AABB):boolean{
 }
 
 export function pointVSCircle(point:Point, circle:Circle):boolean{
-    const dx = (point.x - circle.x);
-    const dy = (point.y - circle.y);
-    const d2 = (dx * dx) + (dy * dy) ;
-    const r2 = circle.radius * circle.radius;
-    return r2 >= d2;
-    // const center = new Point(); 
-    // center.x = circle.x;
-    // center.y = circle.y;
-    // return Point.getDistanceBetween(point,center) <= circle.radius;
+    return Point.getDistanceBetween(point, circle.getCenter()) <= circle.radius;
 }
 
 export function circleVScircle(a:Circle, b:Circle):boolean{
-    const centerA:Point = new Point();
-    const centerB:Point = new Point();
-    centerA.x = a.x;
-    centerA.y = a.y;
+    return  Point.getDistanceBetween( a.getCenter() , b.getCenter()) <= a.radius + b.radius;
+}
 
-    centerB.x = b.x;
-    centerB.y = b.y;
+export function pointVSOBB(point:Point, obb:OBB):boolean{
+    let right:boolean = null;
+    const points = obb.getPoints();
+    for( let i:number = 0; i < points.length ; i++ ){
+        const a:Point = points[i];
+        const b:Point = (i+1 >= points.length ) ? points[0] : points[i+1];
+        const segment:Segment = new Segment(a,b);
+        if( i == 0 ){
+            right = segment.isOnRight(point);
+        }
+        else{
+            if( right !== segment.isOnRight(point)){
+                return false;
+            }
+        }
+    }
+    return true;
+}
 
-    const distA:number = Point.getDistanceBetween(centerA, centerB);
-    const distB:number = a.radius + b.radius;
-    return  distA <= distB;
+export function segmentVSSegment(a:Segment, b:Segment):boolean{
+    return !(b.isOnLeft(a.a) === b.isOnLeft(a.b));
+}
+
+export function segmentVSCircle(segment:Segment, circ:Circle):boolean{
+    return false;
 }

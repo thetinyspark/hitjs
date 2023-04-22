@@ -1,7 +1,9 @@
-import {pointVSAABB,AABBVSAABB, pointVSCircle, circleVScircle} from "../../lib/2d/collision";
+import {pointVSAABB,AABBVSAABB, pointVSCircle, circleVScircle,segmentVSSegment, pointVSOBB} from "../../lib/2d/collision";
 import AABB from "../../lib/2d/primitive/AABB";
 import Circle from "../../lib/2d/primitive/Circle";
+import OBB from "../../lib/2d/primitive/OBB";
 import Point from "../../lib/2d/primitive/Point";
+import Segment from "../../lib/2d/primitive/Segment";
 
 describe('2d collision test suite', 
 ()=>{
@@ -24,17 +26,8 @@ describe('2d collision test suite',
         const expectedResults = testbed.map( (t)=>t.expected);
         const results = testbed.map(
             (test)=>{
-                const point = new Point();
-                const box   = new AABB();
-
-                point.x     = test.point.x;
-                point.y     = test.point.y;
-
-                box.x       = test.box.x;
-                box.y       = test.box.y;
-                box.width   = test.box.w;
-                box.height  = test.box.h;
-
+                const point = new Point(test.point.x, test.point.y);
+                const box   = new AABB(test.box.x, test.box.y, test.box.w, test.box.h);
                 return pointVSAABB(point,box);
             }
         ); 
@@ -67,19 +60,8 @@ describe('2d collision test suite',
         const expectedResults = testbed.map( (t)=>t.expected);
         const results = testbed.map(
             (test)=>{
-                const boxA   = new AABB();
-                const boxB   = new AABB();
-
-                boxA.x       = test.boxA.x;
-                boxA.y       = test.boxA.y;
-                boxA.width   = test.boxA.w;
-                boxA.height  = test.boxA.h;
-
-                boxB.x       = test.boxB.x;
-                boxB.y       = test.boxB.y;
-                boxB.width   = test.boxB.w;
-                boxB.height  = test.boxB.h;
-
+                const boxA   = new AABB(test.boxA.x,test.boxA.y,test.boxA.w,test.boxA.h);
+                const boxB   = new AABB(test.boxB.x,test.boxB.y,test.boxB.w,test.boxB.h);
                 return AABBVSAABB(boxA,boxB);
             }
         ); 
@@ -106,16 +88,8 @@ describe('2d collision test suite',
         const expectedResults = testbed.map( (t)=>t.expected);
         const results = testbed.map(
             (test)=>{
-                const point   = new Point();
-                const circ   = new Circle();
-
-                point.x     = test.point.x;
-                point.y     = test.point.y;
-
-                circ.x      = test.circ.x;
-                circ.y      = test.circ.y;
-                circ.radius = test.circ.r;
-
+                const point   = new Point(test.point.x,test.point.y);
+                const circ   = new Circle(test.circ.x,test.circ.y,test.circ.r);
                 return pointVSCircle(point,circ);
             }
         ); 
@@ -139,18 +113,90 @@ describe('2d collision test suite',
         const expectedResults = testbed.map( (t)=>t.expected);
         const results = testbed.map(
             (test)=>{
-                const a   = new Circle();
-                const b   = new Circle();
-
-                a.x      = test.a.x;
-                a.y      = test.a.y;
-                a.radius = test.a.r;
-
-                b.x      = test.b.x;
-                b.y      = test.b.y;
-                b.radius = test.b.r;
-
+                const a   = new Circle(test.a.x,test.a.y,test.a.r);
+                const b   = new Circle(test.b.x,test.b.y,test.b.r);
                 return circleVScircle(a,b);
+            }
+        ); 
+
+        // then 
+        expect(expectedResults).toEqual(results);
+    }); 
+
+    it('should be able to say if a point collides an OBB or not', 
+        ()=>{
+            // given
+            const data = [
+                { 
+                    obb: new OBB(0,0,100,100,0), 
+                    target: new Point(50,50), 
+                    expected: true
+                },
+                { 
+                    obb: new OBB(0,0,100,100,45), 
+                    target: new Point(50,50), 
+                    expected: true
+                },
+                { 
+                    obb: new OBB(0,0,100,100,45), 
+                    target: new Point(10,10), 
+                    expected: false
+                },
+                { 
+                    obb: new OBB(0,0,100,100,45), 
+                    target: new Point(100,100), 
+                    expected: false
+                },
+            ];
+
+            // when 
+            const expected = data.map( t => t.expected); 
+            const results = data.map(
+                (test)=>{
+                    return pointVSOBB(test.target, test.obb);
+                }
+            );
+
+
+            // when then 
+            expect(results).toEqual(expected)
+    });
+
+    it('should be able to say if a segment crosses another one', 
+    ()=>{
+        // given
+        const testbed = [
+            {
+                a:{x1:0,y1:0,x2:100,y2:100}, 
+                b:{x1:0,y1:100,x2:100,y2:0}, 
+                expected:true 
+            },
+            {
+                // shares one vertex
+                a:{x1:0,y1:0,x2:100,y2:100}, 
+                b:{x1:100,y1:100,x2:100,y2:0}, 
+                expected:false 
+            },
+            {
+                // shares 0 vertex
+                a:{x1:0,y1:0,x2:100,y2:100}, 
+                b:{x1:101,y1:101,x2:100,y2:0}, 
+                expected:false 
+            },
+            {
+                a:{x1:0,y1:0,x2:1000,y2:0}, 
+                b:{x1:100,y1:-100,x2:0,y2:100}, 
+                expected:true
+            },
+        ];
+
+        // when 
+        const expectedResults = testbed.map( (t)=>t.expected);
+        const results = testbed.map(
+            (test)=>{
+                const a   = new Segment( new Point(test.a.x1,test.a.y1), new Point(test.a.x2,test.a.y2));
+                const b   = new Segment( new Point(test.b.x1,test.b.y1), new Point(test.b.x2,test.b.y2));
+                return segmentVSSegment(a,b);
             }
         ); 
 
