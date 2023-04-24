@@ -1,6 +1,6 @@
 {
   "name": "hitjs",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Your project description",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -8,9 +8,9 @@
     "/dist"
   ],
   "scripts": {
-    "exp":"http-server ./",
     "pub": "npm login && npm publish --access public",
-    "build": "tsc && npx webpack --config webpack.config.js",
+    "build": "set NODE_OPTIONS=--openssl-legacy-provider && tsc && npx webpack --config webpack.config.js",
+    "build:serve": "npm run build && http-server ./",
     "test": "karma start",
     "test:ci": "karma start --single-run",
     "doc": "typedoc"
