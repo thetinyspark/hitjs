@@ -1,4 +1,4 @@
-import {pointVSAABB,AABBVSAABB, pointVSCircle, circleVScircle,segmentVSSegment, pointVSOBB} from "../../lib/2d/collision";
+import {pointVSAABB,AABBVSAABB, pointVSCircle, circleVScircle,segmentVSSegment, pointVSOBB, segmentVSCircle} from "../../lib/2d/collision";
 import AABB from "../../lib/2d/primitive/AABB";
 import Circle from "../../lib/2d/primitive/Circle";
 import OBB from "../../lib/2d/primitive/OBB";
@@ -197,6 +197,57 @@ describe('2d collision test suite',
                 const a   = new Segment( new Point(test.a.x1,test.a.y1), new Point(test.a.x2,test.a.y2));
                 const b   = new Segment( new Point(test.b.x1,test.b.y1), new Point(test.b.x2,test.b.y2));
                 return segmentVSSegment(a,b);
+            }
+        ); 
+
+        // then 
+        expect(expectedResults).toEqual(results);
+    }); 
+
+    it('should be able to say if a segment crosses a circle or not', 
+    ()=>{
+        // given
+        const testbed = [
+ 
+                {
+                    segment:[{x:0,y:0}, {x:150,y:-20}], 
+                    circle: {x:150,y:-20,radius:50}, 
+                    expected: true
+                },
+                {
+                    segment:[{x:0,y:-70}, {x:300,y:-68}], 
+                    circle: {x:150,y:-20,radius:50},
+                    expected: true
+                },
+                {
+                    segment:[{x:0,y:-71}, {x:300,y:-71}], 
+                    circle: {x:150,y:-20,radius:50}, 
+                    expected: false
+                },
+                {
+                    segment:[{x:150,y:100}, {x:150,y:-100}], 
+                    circle: {x:150,y:-20,radius:50}, 
+                    expected: true
+                },
+                {
+                    segment:[{x:150,y:20}, {x:150,y:-40}], 
+                    circle: {x:150,y:-20,radius:50}, 
+                    expected: true
+                }
+            
+        ];
+
+        // when 
+        const expectedResults = testbed.map( (t)=>t.expected);
+        const results = testbed.map(
+            (test)=>{
+                const segment = new Segment( 
+                    new Point(test.segment[0].x,test.segment[0].y), 
+                    new Point(test.segment[1].x,test.segment[1].y)
+                ); 
+
+                const circle = new Circle( test.circle.x, test.circle.y, test.circle.radius);
+                return segmentVSCircle(segment,circle);
             }
         ); 
 

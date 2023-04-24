@@ -28,6 +28,23 @@ export default class Segment{
         return determinant > 0;
     }
 
+    isOnSegment(point:Point):boolean{
+        if( !this.isOnSameLine(point) )
+            return false;
+
+        const minX:number = Math.min(this.a.x, this.b.x);
+        const maxX:number = Math.max(this.a.x, this.b.x);
+        const minY:number = Math.min(this.a.y, this.b.y);
+        const maxY:number = Math.max(this.a.y, this.b.y);
+
+        return !(
+            point.x < minX || 
+            point.x > maxX || 
+            point.y < minY || 
+            point.y > maxY 
+        );
+    }
+
     isOnSameLine(point:Point):boolean{
         const a = this.toVector();
         const b = new Segment(this.a, point).toVector();

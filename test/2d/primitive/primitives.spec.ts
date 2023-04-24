@@ -190,6 +190,58 @@ describe('Primitives',
             // then 
             expect(results).toEqual(expected);
         });
+
+        it('should be able to say if a point is on the same line', 
+        ()=>{
+            // given
+            const data = [
+                { seg: {x1:0, y1:0, x2:100, y2:100}, point:{x:50,y:50}, expected:true},
+                { seg: {x1:0, y1:0, x2:100, y2:100}, point:{x:-50,y:-50}, expected:true},
+                { seg: {x1:0, y1:0, x2:100, y2:100}, point:{x:-150,y:-150}, expected:true},
+                { seg: {x1:0, y1:0, x2:100, y2:100}, point:{x:100,y:101}, expected:false},
+            ];
+
+            // when
+            const expected = data.flatMap( t => t.expected );
+            const results = data.flatMap( 
+                (test)=>{
+                    const segment = new Segment(
+                        new Point(test.seg.x1, test.seg.y1),
+                        new Point(test.seg.x2, test.seg.y2)
+                    );
+                    return segment.isOnSameLine(new Point(test.point.x, test.point.y));
+                }
+            );
+
+            // then 
+            expect(results).toEqual(expected);
+        });
+
+        it('should be able to say if a point is on a segment or not', 
+        ()=>{
+            // given
+            const data = [
+                { seg: {x1:0, y1:0, x2:100, y2:100}, point:{x:50,y:50}, expected:true},
+                { seg: {x1:0, y1:0, x2:100, y2:100}, point:{x:-50,y:-50}, expected:false},
+                { seg: {x1:0, y1:0, x2:100, y2:100}, point:{x:-150,y:-150}, expected:false},
+                { seg: {x1:0, y1:0, x2:100, y2:100}, point:{x:100,y:101}, expected:false},
+            ];
+
+            // when
+            const expected = data.flatMap( t => t.expected );
+            const results = data.flatMap( 
+                (test)=>{
+                    const segment = new Segment(
+                        new Point(test.seg.x1, test.seg.y1),
+                        new Point(test.seg.x2, test.seg.y2)
+                    );
+                    return segment.isOnSegment(new Point(test.point.x, test.point.y));
+                }
+            );
+
+            // then 
+            expect(results).toEqual(expected);
+        });
     });
 
     describe('Vector test suite', 

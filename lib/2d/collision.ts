@@ -3,6 +3,7 @@ import Circle from "./primitive/Circle";
 import OBB from "./primitive/OBB";
 import Point from "./primitive/Point";
 import Segment from "./primitive/Segment";
+import Vector from "./primitive/Vector";
 
 export function pointVSAABB(point:Point, aabb:AABB):boolean{
     const left:number   = aabb.x;
@@ -65,5 +66,35 @@ export function segmentVSSegment(a:Segment, b:Segment):boolean{
 }
 
 export function segmentVSCircle(segment:Segment, circ:Circle):boolean{
-    return false;
+
+    const vec:Vector = segment.toVector();
+    const ortho:Vector = Vector.getOrtho(vec);
+    const dividor:number = 1 / 1000000000000;
+
+    const a1:number = ( vec.x === 0 ) ? vec.y / dividor : vec.y / vec.x;
+    const b1:number = -(a1 * segment.a.x - segment.a.y);
+
+    const a2:number = ( ortho.x === 0 ) ? ortho.y / dividor :ortho.y / ortho.x;
+    const b2:number = -(a2*circ.x - circ.y);
+
+    if( a1 === a2 )
+        return false;
+
+    const crossPointX:number = -(b1 - b2) / (a1 - a2);
+    const crossPointY:number = crossPointX * a1 + b1;
+    const crossPoint:Point = new Point( Math.round( crossPointX ), Math.round( crossPointY) );
+    const dist:number = Point.getDistanceBetween(circ.getCenter(), crossPoint);
+
+    const minX:number = Math.min(segment.a.x, segment.b.x);
+    const maxX:number = Math.max(segment.a.x, segment.b.x);
+    const minY:number = Math.min(segment.a.y, segment.b.y);
+    const maxY:number = Math.max(segment.a.y, segment.b.y);
+    const isOnSegment:boolean = !(
+        crossPoint.x < minX || 
+        crossPoint.x > maxX || 
+        crossPoint.y < minY || 
+        crossPoint.y > maxY 
+    );
+    
+    return isOnSegment && dist <= circ.radius;
 }
